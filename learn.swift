@@ -1,6 +1,11 @@
 // FIXME: To run the file, use this command to suppress all warning:
 // swiftc learn.swift -suppress-warnings && ./learn 
 
+// FIXME: you will see many do{...} block, that's because
+// i want code snippets are context-independent and 
+// this file continue to run even when an exception throw.
+
+
 /*
     TODO: Swift introduction
         + Variables and Constants 
@@ -762,20 +767,230 @@ do {
     Functions are a key part of Swift's structure, and are 
     units of code that can accept parameters and can 
     return values.
-        + 
-        + 
-        + 
 */
 
+// use func to declare a function
+do {
+    func greet(person: String, day: String) -> String {
+        return "Hello \(person), today is \(day)."
+    }
+    print(greet(person:"Bob", day :"Tuesday"))
+}
+
+// by default, functions use their parameter names as labels for 
+// their arguments. Write a custom argument label before the 
+// parameter name, or write _ to use no argument label
+do {
+    func greet(_ person: String, on day: String) -> String {
+        return "Hello \(person), today is \(day)"
+    }
+    print(greet("John", on: "Wednesday"))
+}
+
+// use a tuple to make compound value -- for example, to 
+// return multiple value from a function, the elements of 
+// a tuple can be referred to either by name or by number 
+do {
+    func calculateStats(scores: [Int]) 
+        -> (min: Int, max: Int, sum: Int) {
+        var min = scores[0]
+        var max = scores[0]
+        var sum = 0
+
+        for score in scores {
+            if score > max {
+                max = score
+            } else if score < min {
+                min = score
+            }
+            sum += score
+        }
+        return (min, max, sum)
+    }
+
+    let statistics = calculateStats(scores: [5, 3, 100, 3, 9])
+    print(statistics.min)   // => 3   (min)
+    print(statistics.2)     // => 120 (sum)   
+}
+
+// func can be nested
+do {
+    func returnFifteen() -> Int {
+        var y = 10
+        func add() { y += 5 }
+        add()
+        return y
+    }
+
+    print(returnFifteen())  // => 15
+}
+
+// func are first-class type. This means that a function 
+// can return another function as its value.
+do {
+    func makeIncrementer() -> ((Int)->Int) {
+        func addOne(number: Int) -> Int {
+            return 1 + number
+        }
+        return addOne
+    }
+
+    var increment = makeIncrementer()
+    print(increment(2))     // => 3
+}
+
+// a func can take another func as one of its arguments
+do {
+    func hasAnyMatches(
+        list: [Int], condition: (Int) -> Bool)-> Bool {
+        for item in list {
+            if condition(item) {
+                return true
+            }
+        }
+        return false
+    }
+
+    func lessThanTen(number: Int) -> Bool {
+        return number < 10
+    }
+
+    var numbers = [20, 19, 7, 12]
+    print(hasAnyMatches(list: numbers, condition: lessThanTen))
+}
+
+// func are actually a special case of Closures: 
+// Blocks of code that can be called later
+// you can write a closure without a name by 
+// surrounding code with `braces: {}`. use in to separate 
+// the arguments and the type from the body
+do {
+    var someNumbers = [1,2,3,4,5,6]
+    print(
+        someNumbers.map({
+            (number: Int) -> Int in 
+            if number%2==0 {
+                return number
+            } else {
+                return 0
+            }
+        })
+    )
+}
+
+// When a closure’s type is already known, 
+// such as the callback for a delegate, 
+// you can omit the type of its parameters, 
+// its return type, or both. Single statement closures
+// implicitly return the value of their only statement.
+do {
+    var someNumbers = [1,2,3,4,5,6]
+    let mappedNumbers = someNumbers.map({ number in 3 * number })
+    print(mappedNumbers)
+}
+
+// You can refer to parameters by number instead of by 
+// name—this approach is especially useful in very short closures. 
+// A closure passed as the last argument to a function can 
+// appear immediately after the parentheses. When a closure 
+// is the only argument to a function, you can omit the 
+// parentheses entirely.
+do {
+    var numbers = [20, 19, 7, 12]
+    let sortedNumbers = numbers.sorted { $0 > $1 }
+    print(sortedNumbers)
+}
 
 
 /*
     TODO: Error handling
-    will help ensure all the code you develop in Swift will 
-    be robust and of high quality.
-        + do ... catch statement
-
+    Swift Error Handling is all about handling the failing 
+    conditions gracefully, ensure all the code you develop 
+    will be robust and of high quality.
+    
+    ! Error Protocol is just a type for representing error 
+    values that can be thrown.
 */
+
+// Swift requires you to create a custom Error type. 
+// Typically an Enum is used which conforms to the Error Protocol.
+// The Error Protocol is more or less empty. Hence you don’t 
+// need to override anything from them. Error Protocol is a must 
+// for Error Handling and creating Error types.
+do {
+    enum UserDetailError: Error {
+        case noValidName
+        case noValidAge
+    }
+
+    // throws modifier must be added in the definition
+    // throw keyword is used for throwing errors from the error type defined.
+    func userTest(age: Int, name: String) throws {
+        guard age > 0 else{
+            throw UserDetailError.noValidAge
+        }
+
+        guard name.count > 0 else{
+           throw UserDetailError.noValidName
+        }
+    }
+
+    // do ... catch is similar to try ... catch block
+    do {
+        try userTest(age: -1, name: "")
+    } catch let error {
+        print("Error: \(error)")
+    }
+
+}
+
+// try || try? || try!
+do {
+    enum StudentError: Error {
+        case invalid(String)
+        case tooShort
+    }
+
+    class Student {
+        var name: String?
+        init(name: String?) throws {
+            guard let name = name else{
+                throw StudentError.invalid("Invalid")
+            }
+            self.name = name 
+        }
+
+        func myName(str: String) throws -> String {
+            guard str.count > 5 else {
+                throw StudentError.tooShort
+            }
+            return "My name is \(str)"
+        }
+    }
+
+    // example 1
+    do {
+        var s = try Student(name: nil)
+    } catch let error {
+        print(error) // invalid("Invalid")
+    }
+
+    // example 2
+    do {
+        var s = try Student(name: "tamtito")
+        try s.myName(str: "tam")
+    } catch let error {
+        print(error)
+    }
+
+    // you can get rid of do ... catch by using try? || try!
+    // try? is used to handle errors by converting the error 
+    // into an optional value
+    // try! is used to assert that the error won’t occur.
+    var t1 = try? Student(name: nil)
+    var t2 = try! Student(name: "Anupam")
+}
+
 
 
 /*
@@ -785,8 +1000,146 @@ do {
     will help your code re-usable, easy to maintain & design.
 */
 
+// simple example 
+do {
+    class Shape {
+        var numberOfSides = 0
+        func simpleDescription() -> String {
+            return "A shape with \(numberOfSides) sides."
+        }
+    }
 
+    var shape = Shape()
+    shape.numberOfSides = 7
+    var shapeDescription = shape.simpleDescription()
+    print(shapeDescription)
+}
+
+// Getter & Setter & Override
+do {
+    class NamedShape {
+        var numberOfSides: Int = 0
+        var name: String
+
+        init(name: String) {
+            self.name = name
+        }
+
+        func simpleDescription() -> String {
+            return "A shape with \(numberOfSides) sides."
+        }
+    }
+
+    // Override
+    class Square : NamedShape {
+        var sideLength: Double
+
+        init(sideLength: Double, name: String) {
+            self.sideLength = sideLength
+            super.init(name: name)
+            numberOfSides = 4
+        }
+
+        func area() -> Double {
+            return sideLength * sideLength
+        }
+
+        override func simpleDescription() -> String {
+            return "A square with sides of length \(sideLength)"
+        }
+    }
+
+    let test = Square(sideLength: 5.2, name: "my test square")
+    print(test.area())
+    print(test.simpleDescription())
+    print(test.numberOfSides)
+
+
+    // Getter & Setter 
+    class EquilateralTriangle: NamedShape {
+        var sideLength: Double = 0.0
+        var perimeter: Double {
+            get { return 3.0 * sideLength }
+            set { sideLength = newValue / 3.0 }
+        }
+
+        init(sideLength: Double, name: String) {
+            self.sideLength = sideLength
+            super.init(name: name)
+            numberOfSides = 3
+        }
+
+        override func simpleDescription() -> String {
+            return "An equilateral triangle with sides of length \(sideLength)."
+        }
+    }
+
+    var triangle = EquilateralTriangle(
+        sideLength: 3.1, name: "a triangle")
+    print(triangle.perimeter)
+    // Prints "9.3"
+
+    triangle.perimeter = 9.9
+    print(type(of: triangle.sideLength))
+    // Prints "3.3000000000000003"
+}
 
 /*
-    TODO: 
-*/ 
+    TODO: Struct     
+    Structures suppport many of the same behavior as classes.
+    but, Structures are always copied when thay are passed 
+    around in your code, but classes are passed by referrence
+*/
+
+do {
+    enum Rank: Int {
+        case ace = 1
+        case two, three, four, five, six, seven, eight, nine, ten
+        case jack, queen, king
+
+        func simpleDescription() -> String {
+            switch self {
+            case .ace:
+                return "ace"
+            case .jack:
+                return "jack"
+            case .queen:
+                return "queen"
+            case .king:
+                return "king"
+            default:
+                return String(self.rawValue)
+            }
+        }
+    }
+
+    enum Suit {
+        case spades, hearts, diamonds, clubs
+
+        func simpleDescription() -> String {
+            switch self {
+            case .spades:
+                return "spades"
+            case .hearts:
+                return "hearts"
+            case .diamonds:
+                return "diamonds"
+            case .clubs:
+                return "clubs"
+            }
+        }
+    }
+
+    // struct example
+    struct Card {
+        var rank: Rank
+        var suit: Suit
+        func simpleDescription() -> String {
+            return "The \(rank.simpleDescription()) of \(suit.simpleDescription())"
+        }
+    }
+
+    let threeOfSpades = Card(rank: .three, suit: .spades)
+    let threeOfSpadesDescription = threeOfSpades.simpleDescription()
+    print(threeOfSpadesDescription)
+}
