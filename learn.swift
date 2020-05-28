@@ -1,4 +1,4 @@
-// FIXME: To run the file, use this command to suppress all warning :
+// FIXME: To run the file, use this command to suppress all warning:
 // swiftc learn.swift -suppress-warnings && ./learn 
 
 /*
@@ -603,7 +603,158 @@ do {
         + Sets
         + Dcitionary
 */
+// An array is simply a container that can hold multiple data 
+// (values) of a data type in an ordered list, i.e. you get 
+// the elements in the same order as you defined the items 
+// in the array.
+do {
+    // declare empty array
+    let emptyIntArr:[Int] = []
+    print(emptyIntArr)
 
+    var shoppingList = ["catfish", "water", "tulips"]
+    shoppingList.append("blue paint")
+    print(shoppingList)
+
+    // access member
+    let secondElement = shoppingList[1]
+    print(secondElement)
+
+    // util
+    print(shoppingList.isEmpty)
+    print(shoppingList.first)
+    print(shoppingList.count)
+
+    // append another array
+    var secondArr = ["computer", "mouse"]
+    shoppingList.append(contentsOf: secondArr)
+    print(shoppingList)
+
+    // insert at specific index
+    shoppingList.insert("keyboard", at: 1)
+    print(shoppingList)
+
+    // remove at specific index
+    shoppingList.remove(at: 1)
+    print(shoppingList)
+
+    // revered array
+    let reversedArr = Array(shoppingList.reversed())
+    print(reversedArr)
+}
+
+// Dictionary
+// simply a container that can hold multiple data as 
+// key-value pair in an unordered way.
+do {
+    // Declaring an empty dictionary
+    let emptyDic:[Int:String] = [:]
+    print(emptyDic)
+
+    let anotherEmptyDic:Dictionary<Int, String> = [:]
+    print(anotherEmptyDic)
+
+    // Creating dictionary from two arrays
+    let customKeys = ["Facebook", "Google", "Amazon"]
+    let customValues = ["Mark", "Larry", "Jeff"]
+    let newDictionary = Dictionary(uniqueKeysWithValues: zip(customKeys,customValues))
+    print(newDictionary)
+
+    // Accessing element in a dictionary
+    let someDic = ["a":1, "b":2, "c":3, "d":4, "e":5, "f":6, "g":7, "h":8, "i":9]
+    print(someDic["a"])
+    print(someDic["h"])
+
+    // Access using for ... in loop
+    for (key,value) in someDic {
+        print("key:\(key) value:\(value)")
+    }
+
+    // util
+    var someDictionary = ["Nepal":"Kathmandu", "China":"Beijing", "India":"NewDelhi"]
+    print(someDictionary.isEmpty)
+    print(someDictionary.first)
+    print(someDictionary.count)
+    
+    let dictKeys  = Array(someDictionary.keys)
+    print(dictKeys)
+
+    // remove key - value
+    let val  = someDictionary.removeValue(forKey: "Nepal")
+    print(val)
+    print(someDictionary)
+
+    // !! key should be present
+    // let val  = someDictionary["Vietnam"]
+    // print(val) // => nil
+
+    // default value for non-existen key
+    let val1  = someDictionary["nepal", default:"Not Found"]
+    print(val1)
+}
+
+
+// Sets is simply a container that can hold multiple value of 
+// data type in an unordered list and ensures unique element 
+// in the container (i.e each data appears only once).
+do {
+    // Declaring an empty set
+    var letters = Set<Character>()
+    print("letters is of type Set<Character> with \(letters.count) items.")
+
+    // insert
+    letters.insert("a")
+
+    // letters is now an empty set, 
+    // but is still of type Set<Character>
+    letters = []
+
+    // create Set with an array literal
+    // var favoriteGenres: Set<String> = ["Rock", "Classical", "Hip hop"]
+    // or 
+    var favoriteGenres: Set = ["Rock", "Classical", "Hip hop"]
+
+    // remove an item
+    if let removedGenre = favoriteGenres.remove("Rock") {
+        print("\(removedGenre)? I'm over it.")
+    } else {
+        print("I never much cared for that.")
+    }
+
+    // check contains
+    print(favoriteGenres.contains("Funk"))
+
+    // iterating over a Set
+    for genre in favoriteGenres {
+        print("\(genre)")
+    }
+
+    // Set operation
+    let oddDigits: Set = [1, 3, 5, 7, 9]
+    let evenDigits: Set = [0, 2, 4, 6, 8]
+    let singleDigitPrimeNumbers: Set = [2, 3, 5, 7]
+
+    oddDigits.union(evenDigits).sorted()
+    // [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    oddDigits.intersection(evenDigits).sorted()
+    // []
+    oddDigits.subtracting(singleDigitPrimeNumbers).sorted()
+    // [1, 9]
+    oddDigits.symmetricDifference(singleDigitPrimeNumbers).sorted()
+    // [1, 2, 9]
+
+    // Set Membership and Equality
+    let houseAnimals: Set = ["🐶", "🐱"]
+    let farmAnimals: Set = ["🐮", "🐔", "🐑", "🐶", "🐱"]
+    let cityAnimals: Set = ["🐦", "🐭"]
+
+    houseAnimals.isSubset(of: farmAnimals)
+    // true
+    farmAnimals.isSuperset(of: houseAnimals)
+    // true
+    farmAnimals.isDisjoint(with: cityAnimals)
+    // true
+}
 
 
 /*
